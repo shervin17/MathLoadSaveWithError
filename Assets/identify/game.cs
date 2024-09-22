@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement; // For scene management
 using System.Collections.Generic; // For List<T>
+using System.Collections;
 
 public class QuizManager : MonoBehaviour
 {
@@ -24,8 +25,13 @@ public class QuizManager : MonoBehaviour
     private bool answeredCorrectly = false;  // To check if the correct answer was already given
     private float timeRemaining = 20f; // Timer set to 20 seconds
     private bool isGameActive = true; // To check if the game is active
-    private int hintCount = 3; // Number of hints available
+    private int hintCount = 2; // Number of hints available
     private List<Button> disabledHintButtons = new List<Button>(); // To track buttons disabled by hints
+    private float elapsedTime = 0f;
+    private Button correctButton;
+    private int max_tries = 3;
+    private List<Button> wrongClickedButtons= new List<Button> ();
+
 
     void Start()
     {
@@ -55,19 +61,40 @@ public class QuizManager : MonoBehaviour
 
         // Set the initial timer text
         timerText.text = "Time: " + Mathf.Ceil(timeRemaining).ToString();
+
+       
+        
+    }
+
+
+    void Awake() { 
+    
+    foreach(Button btn in answerButtons) {
+
+            if (correctAnswer == btn.GetComponentInChildren<Text>().text)
+                correctButton = btn;
+        }
     }
 
     void Update()
     {
         if (!isGameActive) return; // Skip updating if the game is not active
 
-        // Update the timer
-        timeRemaining -= Time.deltaTime;
-        if (timeRemaining <= 0)
-        {
-            timeRemaining = 0;
-            TimeUp(); // Call method to handle time up
+
+        elapsedTime += Time.deltaTime;
+
+        if(elapsedTime >= 5f) {
+
+            timeRemaining -= Time.deltaTime;
+            if (timeRemaining <= 0)
+            {
+                timeRemaining = 0;
+                TimeUp(); // Call method to handle time up
+            }
         }
+
+        // Update the timer
+
 
         // Update the timer text display
         timerText.text = "Time: " + Mathf.Ceil(timeRemaining).ToString();
@@ -76,8 +103,9 @@ public class QuizManager : MonoBehaviour
     // This method is called when an answer button is clicked
     void OnAnswerSelected(Button clickedButton)
     {
-        if (!isGameActive || answeredCorrectly || restartButton.gameObject.activeSelf) return; // Prevent selection if not active or already answered correctly or during retry
-
+        /*if (!isGameActive || answeredCorrectly || restartButton.gameObject.activeSelf) return;*/ // Prevent selection if not active or already answered correctly or during retry
+        if (!isGameActive || answeredCorrectly ) 
+            return;
         // Start the timer when the user selects an answer
         if (timeRemaining == 20f) // Ensure timer starts only once
         {
@@ -96,20 +124,24 @@ public class QuizManager : MonoBehaviour
 
         // Change color of the clicked button to green
         selectedButton.GetComponent<Image>().color = Color.green; // Highlight the clicked button
+      
     }
 
     // This method is called when the Enter button is clicked
     void CheckAnswer()
     {
         if (!isGameActive) return; // Skip checking if the game is not active
-
+        
         if (string.IsNullOrEmpty(selectedAnswer))
         {
             feedbackText.text = noAnswerMessage; // Show message if no answer is selected
             return; // Exit method to prevent further checking
         }
+        
 
         if (answeredCorrectly) return;  // Prevent re-scoring if the correct answer has already been given
+
+        max_tries--;
 
         if (selectedAnswer == correctAnswer)
         {
@@ -117,6 +149,7 @@ public class QuizManager : MonoBehaviour
 
             // Only increment score if it hasn't been updated yet
             score += 10;
+            
             UpdateScoreText();
 
             // Set answeredCorrectly to true to prevent further scoring
@@ -135,19 +168,31 @@ public class QuizManager : MonoBehaviour
         }
         else
         {
-            feedbackText.text = "Wrong! Try again.";
+
+            if (max_tries >= 1)
+                feedbackText.text = "Wrong! Try again.";             
 
             // Change the color of the wrong selected button to red
+
             if (selectedButton != null)
             {
-                selectedButton.GetComponent<Image>().color = Color.red;
+                pauseTimer(2);
+                selectedButton.GetComponentInChildren<Text>().color = Color.grey;
+                selectedButton.interactable = false;
+                wrongClickedButtons.Add(selectedButton);
             }
 
             // Disable all answer buttons to prevent further selection
-            SetAnswerButtonsInteractable(false);
+            /*SetAnswerButtonsInteractable(false);*/
 
             // Show the restart button so the user can retry
             restartButton.gameObject.SetActive(true);
+        }
+        
+        if (max_tries == 0)
+        {
+            correctButton.GetComponent<Image>().color = Color.green;
+            isGameActive = false;
         }
     }
 
@@ -168,6 +213,8 @@ public class QuizManager : MonoBehaviour
         hintButton.interactable = false;
 
         // No scene transition required for game over
+        correctButton.GetComponent<Image>().color = Color.green;
+
     }
 
     // Update the score text display
@@ -237,9 +284,16 @@ public class QuizManager : MonoBehaviour
 
     // Use hint by disabling one wrong answer button
     void UseHint()
-    {
+    {   
         if (!isGameActive || answeredCorrectly || hintCount <= 0) return; // Prevent hint use if the game is not active, answer is already correct, or no hints left
 
+        max_tries--;
+
+        foreach (Button btn in answerButtons)
+        {
+            btn.GetComponent<Image>().color = Color.black; // Reset color
+        }
+        selectedButton = null;
         // Get a list of wrong answer buttons
         var wrongAnswerButtons = new List<Button>();
 
@@ -248,16 +302,36 @@ public class QuizManager : MonoBehaviour
             if (btn.GetComponentInChildren<Text>().text != correctAnswer && !disabledHintButtons.Contains(btn))
             {
                 wrongAnswerButtons.Add(btn);  // Add wrong answer buttons to the list
+               
             }
         }
 
         if (wrongAnswerButtons.Count > 0)
         {
+            
             // Randomly select one wrong answer button to disable
+            
+            if(wrongClickedButtons.Count > 0)
+            {
+                foreach (var btn in wrongClickedButtons) { 
+                    wrongAnswerButtons.Remove(btn);
+                }
+            }
+
+            Debug.Log(wrongClickedButtons.Count);
+
+            if (wrongAnswerButtons.Count == 0) {
+                feedbackText.text = "cannot use hint this time";
+                return;
+            }
             int randomIndex = Random.Range(0, wrongAnswerButtons.Count);
+
             Button buttonToDisable = wrongAnswerButtons[randomIndex];
 
             buttonToDisable.interactable = false;  // Disable the selected wrong answer button
+            buttonToDisable.GetComponentInChildren<Text>().color = Color.blue;
+
+            wrongClickedButtons.Add(buttonToDisable);
 
             // Track the button that was disabled by the hint
             if (!disabledHintButtons.Contains(buttonToDisable))
@@ -276,4 +350,21 @@ public class QuizManager : MonoBehaviour
             hintButton.interactable = false;
         }
     }
+    void pauseTimer(float delay) {
+
+        isGameActive = false;
+        selectedButton.GetComponent<Image>().color = Color.red;
+        StartCoroutine(MyCoroutine(delay));
+        
+        
+    }
+    private IEnumerator MyCoroutine(float delay) {
+
+        yield return new WaitForSeconds(delay); // Pause for the specified delay
+        selectedButton.GetComponent<Image>().color = Color.black;
+        isGameActive = true;
+    }
+  
+
+    
 }
