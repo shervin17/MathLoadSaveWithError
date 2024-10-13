@@ -3,7 +3,7 @@ using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
-public class LetterPuzzleGame : MonoBehaviour
+public class signwordcontrol : MonoBehaviour
 {
     public Text[] blankBoxes;   // The empty boxes where letters are filled
     public Button[] letterButtons; // All the letter buttons

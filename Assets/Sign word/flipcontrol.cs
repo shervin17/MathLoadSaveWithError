@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class flipcontrol : MonoBehaviour
+public class Flipcontrol : MonoBehaviour
 {
     private string flippedCardSymbol;
     private Card flippedCard;

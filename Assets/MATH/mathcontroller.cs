@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 
-public class AnswerCheck : MonoBehaviour
+public class mathcontroller : MonoBehaviour , IDataPersistence
 {
     [System.Serializable]
     public class ButtonData
@@ -11,6 +11,7 @@ public class AnswerCheck : MonoBehaviour
         public int value;       // The value the button holds
     }
 
+    public int current_level;
     public ButtonData[] answerButtons;  // Array of buttons with values
     public Text questionMarkText;       // Text component for displaying the correct answer (the "?" box)
     public Text scoreText;              // Text component for displaying the score
@@ -18,10 +19,16 @@ public class AnswerCheck : MonoBehaviour
     public GameObject tryAgainPopup;    // Reference to the popup panel
     public float popupDuration = 2f;    // How long the popup should show
     public int correctAnswerIndex;      // Index of the correct answer
-    public float timeLimit = 60f;       // Time limit for the level
+    public float timeLimit = 20f;       // Time limit for the level
     private float timer;                // Timer variable
     private int score;                  // Score variable
     private bool isCorrectAnswered;     // Flag to track if the correct answer was clicked
+    private int hints;
+    private bool isScored;
+    private float bestTime;
+    private int unlocked_levels;
+    private bool unlock_next_level;
+    private float time_consumed;
     [SerializeField] private GameObject completionPanel;
 
     void Start()
@@ -67,9 +74,23 @@ public class AnswerCheck : MonoBehaviour
         if (index == correctAnswerIndex)
         {
             questionMarkText.text = answerButtons[index].value.ToString();  // Show the correct answer in the question mark box
-            score += 10;                     // Add to score
+
+            // Add to score
+            time_consumed = timeLimit - timer;
+            if (time_consumed < bestTime && bestTime > 0.0f)
+                bestTime = time_consumed;
+            if (current_level + 1 > unlocked_levels) {
+                unlock_next_level = true;
+                unlocked_levels = current_level + 1;
+            }
+            if (!isScored)
+            {
+                score += 10;
+                isScored = true;
+            }
             UpdateScore();                   // Update score display
             isCorrectAnswered = true;        // Mark that the correct answer has been given
+
         }
         else
         {
@@ -105,5 +126,26 @@ public class AnswerCheck : MonoBehaviour
         {
             buttonData.button.interactable = false;
         }
+    }
+
+    public void LoadGameData(GameData gamedata)
+    {
+        var m  = gamedata.MathGameData;
+        score= m.score;
+        hints = m.hints;
+        unlocked_levels = m.unlocked_levels;
+
+        isScored= m.levels[current_level-1].isScored;
+        bestTime = m.levels[current_level-1].bestTime;
+    }
+
+    public void SaveGameData(ref GameData gameData)
+    {
+       gameData.MathGameData.score = score;
+       gameData.MathGameData.unlocked_levels = unlocked_levels;
+       gameData.MathGameData.hints = hints;
+       gameData.MathGameData.levels[current_level].isUnlocked= unlock_next_level;
+       gameData.MathGameData.levels[current_level-1].bestTime = bestTime;
+       gameData.MathGameData.levels[current_level-1].isScored = isScored;
     }
 }

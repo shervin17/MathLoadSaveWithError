@@ -13,14 +13,14 @@ EditorBuildSettings:
     guid: 71dcd4903ddd4254db5c55e7429621bf
   - enabled: 1
     path: Assets/Assets/math-1.unity
-    guid: 616db272d71bf3841b3de86c514de154
+    guid: 36784da8136c8d342ab8a74f86368c5a
   - enabled: 1
     path: Assets/SignwordUpdated/signword.unity
-    guid: e09c05db9511da744ba3887fbec9e9e5
+    guid: ad7c7ca9eb2b14647ba40eb74c334f4b
   - enabled: 1
     path: Assets/identify/gamecy.unity
-    guid: 0ceb24f16a958964ab40e6148ce1ee50
-  - enabled: 1
+    guid: 13fa7708347ddac438ced8ff0b3cb356
+  - enabled: 0
     path: Assets/Flip/New Folder/Levelselection.unity
     guid: 411a41962d0d02046837798793d71011
   - enabled: 1
@@ -50,7 +50,7 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/MathLevel/math easy.unity
     guid: 2a3ab7bf1b7d1b040b580f9012a23f81
-  - enabled: 1
+  - enabled: 0
     path: Assets/MathLevel/MATH GAME/Math 1.unity
     guid: b77e6fde6c58c4948ad39abde809d9e8
   - enabled: 1
@@ -59,10 +59,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/MathLevel/math 2.unity
     guid: 316e91bcefb5cb6438c33354bb619b0f
-  - enabled: 1
+  - enabled: 0
     path: Assets/MathLevel/math 3.unity
     guid: b80261d93e293064d9ddd929e4dfcd00
-  - enabled: 1
+  - enabled: 0
     path: Assets/MathLevel/math 4.unity
     guid: fa6e1fb66d9134a4aaf0da478e6bf6cf
   - enabled: 1
@@ -149,6 +149,12 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/main_menu.unity
     guid: 00923190bfb595540b87d61e566ad79e
+  - enabled: 1
+    path: Assets/MATH/math-2.unity
+    guid: 5255fa5831bfc834383a0585d90dadc2
+  - enabled: 1
+    path: Assets/AA2DataPersistenceObjects/S123Menu.unity
+    guid: 011646593a9961a4f8da0a3225da80db
   m_configObjects:
     com.unity.adaptiveperformance.loader_settings: {fileID: 11400000, guid: a244abd755b2f0e438b574c7b9e0c1ba, type: 2}
     com.unity.adaptiveperformance.simulator.provider_settings: {fileID: 11400000, guid: cbef4821f08688c41936b2306f8a123c, type: 2}

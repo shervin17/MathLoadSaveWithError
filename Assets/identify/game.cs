@@ -3,7 +3,7 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement; // For scene management
 using System.Collections.Generic; // For List<T>
 
-public class QuizManager : MonoBehaviour
+public class game : MonoBehaviour
 {
     [SerializeField] private Button[] answerButtons;  // Array to hold answer buttons
     [SerializeField] private Button enterButton;      // Reference to the Enter button

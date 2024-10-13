@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
-public class Loading : MonoBehaviour
+public class loading : MonoBehaviour
 {
     [Header("Loading UI Elements")]
     public GameObject loadingScreen;           // Reference to the entire loading screen panel

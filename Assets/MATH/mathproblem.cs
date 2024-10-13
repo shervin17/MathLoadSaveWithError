@@ -3,7 +3,7 @@ using UnityEngine.UI;
 using TMPro;
 using System.Text.RegularExpressions;
 
-public class MathProblem : MonoBehaviour
+public class mathProblem : MonoBehaviour
 {
     // Reference to the image components
     public Image image3;
